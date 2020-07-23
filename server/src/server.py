@@ -179,7 +179,7 @@ def get_events():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="0.0.0.0")
-    parser.add_argument("--port", default=5057)
+    parser.add_argument("--port", default=5000)
     args = parser.parse_args()
     try:
         news_client = NewsApiClient(api_key='3e8fa870c789473db6f68b03586d1f9d')
