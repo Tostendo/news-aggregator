@@ -3,14 +3,30 @@
 from bottle import hook, run, get, post, request, response,  abort, delete
 
 import json
+import dateparser
+from datetime import datetime
+import random
 import uuid
 import time
 import argparse
 from newsapi import NewsApiClient
 import feedparser
 import requests
+from html.parser import HTMLParser
+
+
+class FeedHTMLParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.data = None
+
+    def handle_data(self, data):
+        self.data = data
+
 
 news_client = None
+my_parser = FeedHTMLParser()
+
 
 @hook('after_request')
 def enable_cors():
@@ -21,6 +37,7 @@ def enable_cors():
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, POST, DELETE, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+
 
 all_feeds = [
     'https://www.nachdenkseiten.de/?feed=rss2',
@@ -37,20 +54,38 @@ all_feeds = [
     'https://theintercept.com/feed/?lang=en'
 ]
 
-def _transform_feed(parsed_feed):
-    feed_name = dict(parsed_feed)['feed']['title']
-    entries =  [
-        {
-            'feed_name': feed_name,
-            'title': entry.get('title', 'no_title'),
-            'published': entry.get('published', None),
-            'link': entry.get('link', None),
-            'author': entry.get('author', None),
-            'summary': entry.get('summary', None)
 
-        } for entry in parsed_feed['entries']
-    ]
-    return entries
+def _parse_date(date_string):
+    global my_parser
+    date = dateparser.parse(date_string)
+    if date is not None:
+        return date.date()
+
+    my_parser.feed(date_string)
+    if date is not None:
+        return date.date()
+
+    return datetime.now().date()
+
+
+def _transform_feed(parsed_feed):
+    try:
+        feed_name = dict(parsed_feed)['feed']['title']
+        entries = [
+            {
+                'feed_name': feed_name,
+                'title': entry.get('title', 'no_title'),
+                'published': entry.get('published', None),
+                'link': entry.get('link', None),
+                'author': entry.get('author', None),
+                'summary': entry.get('summary', None)
+
+            } for entry in parsed_feed['entries']
+        ]
+        return entries
+    except Exception as error:
+        print("Could not transform feed: ", error)
+        return []
 
 
 @get('/api/headlines')
@@ -61,7 +96,8 @@ def get_headlines():
     country = query_params.get('country', 'de')
     language = query_params.get('language', 'de')
     try:
-        headlines = news_client.get_top_headlines(q=query, country=country, language=language)
+        headlines = news_client.get_top_headlines(
+            q=query, country=country, language=language)
         return headlines
     except Exception as error:
         print("Error while fetching headlines: ", error)
@@ -81,13 +117,15 @@ def get_sources():
 @get('/api/feeds')
 def get_feeds():
     all_entries = []
-    try: 
+    try:
         for feed in all_feeds:
             try:
                 tmp = _transform_feed(feedparser.parse(feed))
                 all_entries.extend(tmp)
             except Exception as error:
                 print(f'Feed {feed} could not be parsed correctly: ', error)
+        all_entries.sort(key=lambda entry:
+                         _parse_date(entry['published']), reverse=True)
         return {
             'count': len(all_entries),
             'entries': all_entries
@@ -111,36 +149,40 @@ def get_feed():
         print("Could not read feed: ", error)
         abort(500, "Could not fetch feed")
 
+
 @get('/api/entertainment')
 def get_entertainment():
     try:
-        r = requests.get('https://hamburg.mitvergnuegen.com/api/v1/posts/page/1')
+        r = requests.get(
+            'https://hamburg.mitvergnuegen.com/api/v1/posts/page/1')
         if r:
-            data = list(map(lambda post: {'url': post['url'], 'title': post['title']}, r.json()['posts']))
+            data = list(
+                map(lambda post: {'url': post['url'], 'title': post['title']}, r.json()['posts']))
             print(data)
             return {'data': data}
     except Exception as error:
         print("Could not read entertainment: ", error)
         abort(500, "Could not fetch entertainment")
 
+
 @get('/api/events')
 def get_events():
     try:
-        r = requests.get('https://ohschonhell.de/ajax/data_cache.php?load=initial&osh_page=hamburg')
+        r = requests.get(
+            'https://ohschonhell.de/ajax/data_cache.php?load=initial&osh_page=hamburg')
         return r.json()
     except Exception as error:
         print("Could not read events: ", error)
         abort(500, "Could not fetch events")
 
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", default=5057)
     args = parser.parse_args()
     try:
-        news_client  = NewsApiClient(api_key='3e8fa870c789473db6f68b03586d1f9d')
+        news_client = NewsApiClient(api_key='3e8fa870c789473db6f68b03586d1f9d')
     except:
         print("Error while initializing news client. Fix this!!!")
 

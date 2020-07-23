@@ -1,7 +1,12 @@
 import React from "react";
 import "./search-box.style.scss";
 
-export const SearchBox = (props: any) => {
+type Props = {
+  placeholder: string;
+  handleSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+export const SearchBox = (props: Props) => {
   return (
     <div>
       <input

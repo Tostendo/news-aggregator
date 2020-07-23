@@ -1,11 +1,17 @@
 import React, { Component } from "react";
-import "./App.scss";
 import Spinner from "./components/with-spinner/spinner.component";
 import { CardList } from "./components/card-list/card-list.component";
 import { SearchBox } from "./components/search-box/search-box";
+import Footer from "./components/footer/footer.component";
+
+import { getServerUrl } from "./utils/server.utils";
+
+import { FeedMessage } from "./types/message";
+
+import "./App.scss";
 
 type State = {
-  news: any[];
+  news: FeedMessage[];
   searchField: string;
   isLoading: boolean;
 };
@@ -21,7 +27,7 @@ class App extends Component<{}, State> {
   }
 
   componentDidMount() {
-    fetch("http://localhost:5057/api/feeds")
+    fetch(`${getServerUrl()}/api/feeds`)
       .then((response) => response.json())
       .then((news) =>
         this.setState({
@@ -45,17 +51,19 @@ class App extends Component<{}, State> {
 
   render() {
     const { news, searchField } = this.state;
+    console.info(news);
     const filtered = news.filter((message: any) =>
       message.title.toLowerCase().includes(searchField.toLowerCase())
     );
     return (
       <div className="App">
-        <h1>News</h1>
+        <h1>News Me</h1>
         <SearchBox
           placeholder="Search news.."
           handleSearch={this.handleSearch}
         />
         {this.state.isLoading ? <Spinner /> : <CardList news={filtered} />}
+        <Footer />
       </div>
     );
   }
