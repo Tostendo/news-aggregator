@@ -2,6 +2,7 @@
 
 from bottle import hook, run, get, post, request, response,  abort, delete
 
+import os
 import json
 import dateparser
 from datetime import datetime
@@ -182,8 +183,9 @@ if __name__ == "__main__":
     parser.add_argument("--port", default=5000)
     args = parser.parse_args()
     try:
-        news_client = NewsApiClient(api_key='3e8fa870c789473db6f68b03586d1f9d')
+        news_client = NewsApiClient(api_key=os.environ.get(
+            'NEWS_API_KEY', '3e8fa870c789473db6f68b03586d1f9d'))
     except:
         print("Error while initializing news client. Fix this!!!")
 
-    run(port=args.port, host=args.host)
+    run(port=int(os.environ.get('PORT', args.port)), host=args.host)
