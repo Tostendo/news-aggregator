@@ -40,20 +40,25 @@ def enable_cors():
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
 
 
-all_feeds = [
-    'https://www.nachdenkseiten.de/?feed=rss2',
-    'https://norberthaering.de/en/feed/',
-    'https://feeds.feedburner.com/feedburner/ZYYQ',
-    'https://makroskop.eu/feed/',
-    'https://news.ycombinator.com/rss',
-    'https://www.heise.de/tp/news-atom.xml',
-    'https://feeds2.feedburner.com/wmo/apqD',
-    'https://www.lobbycontrol.de/feed/',
-    'https://www.cicero.de/rss.xml',
-    'https://www.theverge.com/rss/index.xml',
-    'https://www.infosperber.ch/inc/rss.cfm?id=106',
-    'https://theintercept.com/feed/?lang=en'
-]
+all_feeds = []
+if os.environ.get('SOURCES', None) is not None:
+    all_feeds = json.loads(os.environ.get('SOURCES'))
+else:
+    all_feeds = [
+        'https://www.nachdenkseiten.de/?feed=rss2',
+        'https://www.rationalgalerie.de/bewegen?format=feed&type=rss',
+        'https://norberthaering.de/en/feed/',
+        'https://feeds.feedburner.com/feedburner/ZYYQ',
+        'https://makroskop.eu/feed/',
+        'https://news.ycombinator.com/rss',
+        'https://www.heise.de/tp/news-atom.xml',
+        'https://feeds2.feedburner.com/wmo/apqD',
+        'https://www.lobbycontrol.de/feed/',
+        'https://www.cicero.de/rss.xml',
+        'https://www.theverge.com/rss/index.xml',
+        'https://www.infosperber.ch/inc/rss.cfm?id=106',
+        'https://theintercept.com/feed/?lang=en'
+    ]
 
 
 def _parse_date(date_string):

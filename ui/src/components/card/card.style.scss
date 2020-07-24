@@ -21,9 +21,7 @@
 
   h2 {
     font-size: 1.2em;
-    overflow: hidden;
     text-overflow: ellipsis;
-    display: -webkit-box;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
   }

@@ -51,8 +51,10 @@ class App extends Component<{}, State> {
 
   render() {
     const { news, searchField } = this.state;
-    const filtered = news.filter((message: any) =>
-      message.title.toLowerCase().includes(searchField.toLowerCase())
+    const filtered = news.filter(
+      (message: any) =>
+        message.title.toLowerCase().includes(searchField.toLowerCase()) ||
+        message.feed_name.toLowerCase().includes(searchField.toLowerCase())
     );
     return (
       <div className="App">
