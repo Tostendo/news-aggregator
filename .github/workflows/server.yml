@@ -1,0 +1,15 @@
+name: Deploy Server
+
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.3.6 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "news-me-backend"
+          heroku_email: "thomas.ostendorf@orbitlabs.de"
+          appdir: "server"
