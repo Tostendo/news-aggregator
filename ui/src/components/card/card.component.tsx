@@ -9,7 +9,12 @@ type Props = {
 
 export const Card = (props: Props) => {
   return (
-    <a className="card-container" target="_blank" href={props.message.link}>
+    <a
+      className="card-container"
+      target="_blank"
+      rel="noopener noreferrer"
+      href={props.message.link}
+    >
       <div className="feed-name">{props.message.feed_name}</div>
       <h2>{props.message.title}</h2>
       <div className="card-meta">
