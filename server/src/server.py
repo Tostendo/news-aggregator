@@ -12,8 +12,22 @@ import time
 import argparse
 from newsapi import NewsApiClient
 import feedparser
+import multiprocessing as mp
 import requests
 from html.parser import HTMLParser
+
+import time
+
+
+def timeit(method):
+
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        print('%r %2.2f sec' % (method.__name__, te-ts))
+        return result
+    return timed
 
 
 class FeedHTMLParser(HTMLParser):
@@ -48,6 +62,8 @@ else:
         'https://www.nachdenkseiten.de/?feed=rss2',
         'https://www.rationalgalerie.de/bewegen?format=feed&type=rss',
         'https://norberthaering.de/en/feed/',
+        'https://www.eat-this.org/feed/',
+        'https://nutritionstripped.com/feed/',
         'https://feeds.feedburner.com/feedburner/ZYYQ',
         'https://makroskop.eu/feed/',
         'https://news.ycombinator.com/rss',
@@ -74,8 +90,9 @@ def _parse_date(date_string):
     return datetime.now().date()
 
 
-def _transform_feed(parsed_feed):
+def _transform_feed(feed_url):
     try:
+        parsed_feed = feedparser.parse(feed_url)
         feed_name = dict(parsed_feed)['feed']['title']
         entries = [
             {
@@ -121,15 +138,14 @@ def get_sources():
 
 
 @get('/api/feeds')
+@timeit
 def get_feeds():
     all_entries = []
+    pool = mp.Pool(mp.cpu_count())
     try:
-        for feed in all_feeds:
-            try:
-                tmp = _transform_feed(feedparser.parse(feed))
-                all_entries.extend(tmp)
-            except Exception as error:
-                print(f'Feed {feed} could not be parsed correctly: ', error)
+        results = pool.map(
+            _transform_feed, [row for row in all_feeds])
+        [all_entries.extend(one_result) for one_result in results]
         all_entries.sort(key=lambda entry:
                          _parse_date(entry['published']), reverse=True)
         return {
@@ -139,6 +155,8 @@ def get_feeds():
     except Exception as error:
         print("Could not read all feeds: ", error)
         abort(500, "Could not fetch all feeds")
+    finally:
+        pool.close()
 
 
 @get('/api/feed')
@@ -146,7 +164,7 @@ def get_feed():
     query_params = request.query
     feed_url = query_params.get('feed_url')
     try:
-        all_entries = _transform_feed(feedparser.parse(feed_url))
+        all_entries = _transform_feed(feed_url)
         return {
             'count': len(all_entries),
             'entries': all_entries
