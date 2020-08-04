@@ -150,7 +150,8 @@ def get_feeds():
                          _parse_date(entry['published']), reverse=True)
         return {
             'count': len(all_entries),
-            'entries': all_entries
+            'entries': all_entries,
+            'sources': list(set([entry['feed_name'] for entry in all_entries]))
         }
     except Exception as error:
         print("Could not read all feeds: ", error)

@@ -1,9 +1,53 @@
+@import "./vars.scss";
+
 .App {
   text-align: center;
+
+  .filters {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    line-height: 30px;
+    > * {
+      padding: 0 5px;
+      line-height: 30px;
+      width: 150px;
+      border-radius: 0;
+    }
+
+    .multi-select {
+      -webkit-appearance: none;
+      text-align: left;
+      font-size: $fs-normal;
+      .dropdown-content {
+        font-size: 10px;
+
+        .select-item {
+          padding: 10px;
+          line-height: 1.1;
+          overflow: hidden;
+        }
+      }
+    }
+  }
 }
 
 h1 {
   font-family: "Bigelow Rules", cursive;
   font-size: 72px;
   color: white;
+}
+
+
+@media screen and (max-width: 576px) {
+  .App {
+    .filters {
+      flex-direction: column;
+      > * {
+        padding: 5px;
+        width: 200px;
+      }
+    }
+  }
 }

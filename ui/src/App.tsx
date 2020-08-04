@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
+import MultiSelect from "react-multi-select-component";
 import Spinner from "./components/with-spinner/spinner.component";
 import { CardList } from "./components/card-list/card-list.component";
 import { SearchBox } from "./components/search-box/search-box";
@@ -12,8 +13,11 @@ import "./App.scss";
 
 type State = {
   news: FeedMessage[];
+  filtered: FeedMessage[];
   searchField: string;
   isLoading: boolean;
+  allSources: { label: string; value: string }[];
+  selectedSources: { label: string; value: string }[];
 };
 
 class App extends Component<{}, State> {
@@ -22,7 +26,10 @@ class App extends Component<{}, State> {
     this.state = {
       isLoading: true,
       news: [],
+      filtered: [],
       searchField: "",
+      allSources: [],
+      selectedSources: [],
     };
   }
 
@@ -33,6 +40,12 @@ class App extends Component<{}, State> {
         this.setState({
           isLoading: false,
           news: news["entries"],
+          allSources: news["sources"].map((source: string) => {
+            return {
+              label: source,
+              value: source.toLowerCase(),
+            };
+          }),
         })
       )
       .catch((err) => {
@@ -49,20 +62,70 @@ class App extends Component<{}, State> {
     });
   };
 
+  handleSelect = (selected: any[]) => {
+    this.setState({
+      selectedSources: selected,
+    });
+  };
+
+  // FIXME(TO): This should be refactored soon.
+  getFilteredResults = () => {
+    const { news, searchField, selectedSources } = this.state;
+    if (!searchField && selectedSources.length === 0) {
+      return news;
+    }
+
+    const selectedFeeds = selectedSources.map((source) => source.value);
+
+    if (!searchField) {
+      return news.filter((message: FeedMessage) =>
+        selectedFeeds.includes(message.feed_name.toLowerCase())
+      );
+    }
+
+    if (selectedSources.length === 0) {
+      return news.filter((message: FeedMessage) => {
+        return (
+          message.title.toLowerCase().includes(searchField.toLowerCase()) ||
+          message.feed_name.toLowerCase().includes(searchField.toLowerCase())
+        );
+      });
+    }
+
+    return news.filter((message: FeedMessage) => {
+      return (
+        (message.title.toLowerCase().includes(searchField.toLowerCase()) ||
+          message.feed_name
+            .toLowerCase()
+            .includes(searchField.toLowerCase())) &&
+        selectedFeeds.includes(message.feed_name.toLowerCase())
+      );
+    });
+  };
+
   render() {
-    const { news, searchField } = this.state;
-    const filtered = news.filter(
-      (message: any) =>
-        message.title.toLowerCase().includes(searchField.toLowerCase()) ||
-        message.feed_name.toLowerCase().includes(searchField.toLowerCase())
-    );
+    const filtered = this.getFilteredResults();
     return (
       <div className="App">
         <h1>News Me</h1>
-        <SearchBox
-          placeholder="Search news.."
-          handleSearch={this.handleSearch}
-        />
+        <div className="filters">
+          <SearchBox
+            placeholder="Search news.."
+            handleSearch={this.handleSearch}
+          />
+          <MultiSelect
+            options={this.state.allSources}
+            value={this.state.selectedSources}
+            onChange={this.handleSelect}
+            labelledBy={"Select"}
+            overrideStrings={{
+              selectSomeItems: "Select feeds ...",
+              allItemsAreSelected: "All feeds are selected.",
+              selectAll: "Select All",
+              search: "Search",
+            }}
+          />
+        </div>
         {this.state.isLoading ? <Spinner /> : <CardList news={filtered} />}
         <Footer />
       </div>
