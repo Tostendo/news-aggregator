@@ -4,6 +4,7 @@ import Spinner from "./components/with-spinner/spinner.component";
 import { CardList } from "./components/card-list/card-list.component";
 import { SearchBox } from "./components/search-box/search-box";
 import Footer from "./components/footer/footer.component";
+import { CustomButton } from "./components/custom-button/custom-button.component";
 
 import { getServerUrl } from "./utils/server.utils";
 
@@ -33,7 +34,11 @@ class App extends Component<{}, State> {
     };
   }
 
-  componentDidMount() {
+  loadData = () => {
+    console.info("click");
+    this.setState({
+      isLoading: true,
+    });
     fetch(`${getServerUrl()}/api/feeds`)
       .then((response) => response.json())
       .then((news) =>
@@ -54,6 +59,10 @@ class App extends Component<{}, State> {
         });
         console.error(err);
       });
+  };
+
+  componentDidMount() {
+    this.loadData();
   }
 
   handleSearch = (e: any) => {
@@ -126,6 +135,9 @@ class App extends Component<{}, State> {
             }}
           />
         </div>
+        <CustomButton onClick={() => this.loadData()}>
+          <div className="icon-reload"></div>
+        </CustomButton>
         {this.state.isLoading ? <Spinner /> : <CardList news={filtered} />}
         <Footer />
       </div>
