@@ -60,20 +60,16 @@ if os.environ.get('SOURCES', None) is not None:
 else:
     all_feeds = [
         'https://www.nachdenkseiten.de/?feed=rss2',
-        'https://www.rationalgalerie.de/bewegen?format=feed&type=rss',
-        'https://norberthaering.de/en/feed/',
         'https://www.eat-this.org/feed/',
         'https://nutritionstripped.com/feed/',
         'https://feeds.feedburner.com/feedburner/ZYYQ',
-        'https://makroskop.eu/feed/',
         'https://news.ycombinator.com/rss',
         'https://www.heise.de/tp/news-atom.xml',
         'https://feeds2.feedburner.com/wmo/apqD',
         'https://www.lobbycontrol.de/feed/',
-        'https://www.cicero.de/rss.xml',
-        'https://www.theverge.com/rss/index.xml',
-        'https://www.infosperber.ch/inc/rss.cfm?id=106',
-        'https://theintercept.com/feed/?lang=en'
+        'https://theintercept.com/feed/?lang=en',
+        'https://www.freitag.de/@@RSS',
+        'https://krass-und-konkret.de/feed/'
     ]
 
 
@@ -107,7 +103,7 @@ def _transform_feed(feed_url):
         ]
         return entries
     except Exception as error:
-        print("Could not transform feed: ", error)
+        print("Could not transform feed: ", error, feed_url)
         return []
 
 
