@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import MultiSelect from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import Spinner from "./components/with-spinner/spinner.component";
 import { CardList } from "./components/card-list/card-list.component";
 import { SearchBox } from "./components/search-box/search-box";
