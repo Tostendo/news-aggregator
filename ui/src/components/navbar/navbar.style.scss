@@ -1,0 +1,18 @@
+.navbar {
+    ul {
+        max-width: 1200px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        list-style: none;
+        padding: 0;
+        padding-inline-start: 0;
+        margin: 16px auto;
+
+        li a {
+            padding: 10px;
+            color: white;
+        }
+    }
+}

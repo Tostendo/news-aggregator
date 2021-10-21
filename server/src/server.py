@@ -18,6 +18,8 @@ from html.parser import HTMLParser
 
 import time
 
+feed_map = {}
+
 
 def timeit(method):
 
@@ -131,6 +133,44 @@ def get_sources():
     except Exception as error:
         print("Could not fetch sources: ", error)
         abort(500, "Could not fetch sources")
+
+@post('/api/feeds/create')
+def create_feed():
+    postdata = json.loads(request.body.read())
+    feeds = postdata["feeds"]
+    if feeds is None or feeds == '':
+        abort(400, "no feeds given")
+    feed_id = uuid.uuid4()
+    result = [x.strip() for x in feeds.split(',')]
+    feed_map[str(feed_id)] = result
+    return {
+        'feed_id': str(feed_id)
+    }
+
+@get('/api/feeds/<feed_id>')
+@timeit
+def get_user_feeds(feed_id):
+    all_entries = []
+    pool = mp.Pool(mp.cpu_count())
+    try:
+        user_feeds = feed_map[feed_id]
+        if user_feeds is None or user_feeds == '':
+            abort(404, "Could not find feeds for user.")
+        results = pool.map(
+            _transform_feed, [row for row in user_feeds])
+        [all_entries.extend(one_result) for one_result in results]
+        all_entries.sort(key=lambda entry:
+                         _parse_date(entry['published']), reverse=True)
+        return {
+            'count': len(all_entries),
+            'entries': all_entries,
+            'sources': list(set([entry['feed_name'] for entry in all_entries]))
+        }
+    except Exception as error:
+        print("Could not read all user feeds: ", error)
+        abort(500, "Could not fetch all feeds")
+    finally:
+        pool.close()
 
 
 @get('/api/feeds')
