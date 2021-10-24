@@ -32,7 +32,10 @@ const CreateFeed = (props: Props) => {
   return (
     <div className="create-feed">
       <h1>Create Feed</h1>
-      <p className="note">Comma separated list of rss feeds</p>
+      <p className="note">
+        Comma separated list of rss feeds. Save the resulting link to get back
+        your feed any time.
+      </p>
       <textarea onChange={handleChange} rows={10} value={feeds} />
       <CustomButton onClick={() => saveData()}> Save</CustomButton>
     </div>

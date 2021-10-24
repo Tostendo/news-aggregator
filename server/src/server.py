@@ -3,12 +3,13 @@
 from bottle import hook, run, get, post, request, response,  abort, delete
 
 import os
+from dotenv import load_dotenv
 import json
 import dateparser
 from datetime import datetime
 import random
 import uuid
-import time
+import time, sys
 import argparse
 from newsapi import NewsApiClient
 import feedparser
@@ -16,9 +17,35 @@ import multiprocessing as mp
 import requests
 from html.parser import HTMLParser
 
-import time
+import pymongo
+from pymongo.errors import OperationFailure
+
+MAX_NUMBER_TRIES = 4
+
+db_client = None
 
 feed_map = {}
+
+def init_db():
+    global db_client
+    load_dotenv()
+    connect_string = os.environ.get(
+            'MONGO_DB_CONNECT_URL', os.getenv('MONGO_DB_CONNECT_URL'))
+    db_client = pymongo.MongoClient(connect_string)
+    for i in range(0,MAX_NUMBER_TRIES):
+        try:
+            db_client.list_database_names()
+            print('Data Base Connection Established........')
+            break
+        except OperationFailure as err:
+            print(f"Data Base Connection failed. Error: {err}")
+            if i == MAX_NUMBER_TRIES - 1:
+                print("Could not reach database. Exit.")
+                sys.exit(1)
+            time.sleep(1)
+            continue
+
+
 
 
 def timeit(method):
@@ -137,23 +164,36 @@ def get_sources():
 @post('/api/feeds/create')
 def create_feed():
     postdata = json.loads(request.body.read())
-    feeds = postdata["feeds"]
-    if feeds is None or feeds == '':
+    global db_client
+    feeds_collection = db_client["news-aggregator"].feeds
+    feeds_str = postdata["feeds"]
+    if feeds_str is None or feeds_str == '':
         abort(400, "no feeds given")
+    result = [x.strip() for x in feeds_str.split(',')]
     feed_id = uuid.uuid4()
-    result = [x.strip() for x in feeds.split(',')]
-    feed_map[str(feed_id)] = result
-    return {
-        'feed_id': str(feed_id)
-    }
+    postdata["_id"] = str(feed_id)
+    postdata["feeds"] = result
+    try:
+        mongo_id = feeds_collection.insert_one(postdata).inserted_id
+        print("insert success " + mongo_id)
+        feed_map[str(feed_id)] = result
+        return {
+            'feed_id': mongo_id
+        }
+    except Exception as err:
+        print("Could not save feed: ", err)
+        abort(500, "Could not save feed")
 
 @get('/api/feeds/<feed_id>')
 @timeit
 def get_user_feeds(feed_id):
+    global db_client
     all_entries = []
     pool = mp.Pool(mp.cpu_count())
     try:
-        user_feeds = feed_map[feed_id]
+        feeds_collection = db_client["news-aggregator"].feeds
+        mongo_document = feeds_collection.find_one({"_id": feed_id})
+        user_feeds = mongo_document["feeds"]
         if user_feeds is None or user_feeds == '':
             abort(404, "Could not find feeds for user.")
         results = pool.map(
@@ -247,5 +287,5 @@ if __name__ == "__main__":
             'NEWS_API_KEY', '3e8fa870c789473db6f68b03586d1f9d'))
     except:
         print("Error while initializing news client. Fix this!!!")
-
+    init_db()
     run(port=int(os.environ.get('PORT', args.port)), host=args.host)
