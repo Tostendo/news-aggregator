@@ -7,7 +7,7 @@ import { FeedMessage } from "./types/message";
 import "./App.scss";
 import { Navbar } from "./components/navbar/navbar.component";
 import Feed from "./components/feed/feed.component";
-import CreateFeed from "./components/create-feed/create-feed.component";
+import UpsertFeed from "./components/upsert-feed/upsert-feed.component";
 
 type State = {
   news: FeedMessage[];
@@ -25,8 +25,12 @@ class App extends Component<{}, State> {
         <Navbar />
         <Switch>
           <Route path="/create">
-            <CreateFeed />
+            <UpsertFeed />
           </Route>
+          <Route
+            path="/feed/:feedId/edit"
+            render={({ match }) => <UpsertFeed {...match} />}
+          ></Route>
           <Route
             path="/feed/:feedId"
             render={({ match }) => <Feed match={match} />}

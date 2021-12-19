@@ -9,7 +9,8 @@ import dateparser
 from datetime import datetime
 import random
 import uuid
-import time, sys
+import time
+import sys
 import argparse
 from newsapi import NewsApiClient
 import feedparser
@@ -26,13 +27,14 @@ db_client = None
 
 feed_map = {}
 
+
 def init_db():
     global db_client
     load_dotenv()
     connect_string = os.environ.get(
-            'MONGO_DB_CONNECT_URL', os.getenv('MONGO_DB_CONNECT_URL'))
+        'MONGO_DB_CONNECT_URL', os.getenv('MONGO_DB_CONNECT_URL'))
     db_client = pymongo.MongoClient(connect_string)
-    for i in range(0,MAX_NUMBER_TRIES):
+    for i in range(0, MAX_NUMBER_TRIES):
         try:
             db_client.list_database_names()
             print('Data Base Connection Established........')
@@ -44,8 +46,6 @@ def init_db():
                 sys.exit(1)
             time.sleep(1)
             continue
-
-
 
 
 def timeit(method):
@@ -161,8 +161,9 @@ def get_sources():
         print("Could not fetch sources: ", error)
         abort(500, "Could not fetch sources")
 
-@post('/api/feeds/create')
-def create_feed():
+
+@post('/api/feeds/sources')
+def create_feed_sources():
     postdata = json.loads(request.body.read())
     global db_client
     feeds_collection = db_client["news-aggregator"].feeds
@@ -183,6 +184,45 @@ def create_feed():
     except Exception as err:
         print("Could not save feed: ", err)
         abort(500, "Could not save feed")
+
+
+@post('/api/feeds/sources/<feed_id>')
+def update_feed_sources(feed_id):
+    updatedata = json.loads(request.body.read())
+    global db_client
+    feeds_collection = db_client["news-aggregator"].feeds
+    feeds_str = updatedata["feeds"]
+    if feeds_str is None or feeds_str == '':
+        abort(400, "no feeds given")
+    result = [x.strip() for x in feeds_str.split(',')]
+    updatedata["_id"] = str(feed_id)
+    updatedata["feeds"] = result
+    try:
+        feeds_collection.update_one(
+            {'_id': feed_id}, {'$set': updatedata})
+        print("patch success")
+        feed_map[str(feed_id)] = result
+        return {
+            'feed_id': feed_id
+        }
+    except Exception as err:
+        print("Could not update feed: ", err)
+        abort(500, "Could not update feed")
+
+
+@get('/api/feeds/sources/<feed_id>')
+def get_feed_sources(feed_id):
+    global db_client
+    feeds_collection = db_client["news-aggregator"].feeds
+    try:
+        data = feeds_collection.find_one(
+            {'_id': feed_id})
+        print("get success")
+        return data
+    except Exception as err:
+        print("Could not fetch feed: ", err)
+        abort(500, "Could not fetch feed")
+
 
 @get('/api/feeds/<feed_id>')
 @timeit
