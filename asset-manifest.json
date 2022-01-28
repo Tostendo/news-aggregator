@@ -1,21 +1,21 @@
 {
   "files": {
-    "main.css": "/news-aggregator/static/css/main.2a9a3561.chunk.css",
-    "main.js": "/news-aggregator/static/js/main.4245f423.chunk.js",
-    "main.js.map": "/news-aggregator/static/js/main.4245f423.chunk.js.map",
+    "main.css": "/news-aggregator/static/css/main.5888ec07.chunk.css",
+    "main.js": "/news-aggregator/static/js/main.8137a6a1.chunk.js",
+    "main.js.map": "/news-aggregator/static/js/main.8137a6a1.chunk.js.map",
     "runtime-main.js": "/news-aggregator/static/js/runtime-main.7aa0a5da.js",
     "runtime-main.js.map": "/news-aggregator/static/js/runtime-main.7aa0a5da.js.map",
     "static/js/2.c5e165e8.chunk.js": "/news-aggregator/static/js/2.c5e165e8.chunk.js",
     "static/js/2.c5e165e8.chunk.js.map": "/news-aggregator/static/js/2.c5e165e8.chunk.js.map",
     "index.html": "/news-aggregator/index.html",
-    "static/css/main.2a9a3561.chunk.css.map": "/news-aggregator/static/css/main.2a9a3561.chunk.css.map",
+    "static/css/main.5888ec07.chunk.css.map": "/news-aggregator/static/css/main.5888ec07.chunk.css.map",
     "static/js/2.c5e165e8.chunk.js.LICENSE.txt": "/news-aggregator/static/js/2.c5e165e8.chunk.js.LICENSE.txt",
     "static/media/index.scss": "/news-aggregator/static/media/neu-laden.6c85ca76.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.7aa0a5da.js",
     "static/js/2.c5e165e8.chunk.js",
-    "static/css/main.2a9a3561.chunk.css",
-    "static/js/main.4245f423.chunk.js"
+    "static/css/main.5888ec07.chunk.css",
+    "static/js/main.8137a6a1.chunk.js"
   ]
 }
