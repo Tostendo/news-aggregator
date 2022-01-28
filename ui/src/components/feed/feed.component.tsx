@@ -22,6 +22,8 @@ type State = {
   isLoading: boolean;
   allSources: { label: string; value: string }[];
   selectedSources: { label: string; value: string }[];
+  title: string | null;
+  description: string | null;
 };
 
 class Feed extends Component<Props, State> {
@@ -34,6 +36,8 @@ class Feed extends Component<Props, State> {
       searchField: "",
       allSources: [],
       selectedSources: [],
+      title: null,
+      description: null,
     };
   }
 
@@ -68,6 +72,8 @@ class Feed extends Component<Props, State> {
               value: source.toLowerCase(),
             };
           }),
+          description: news["description"],
+          title: news["title"],
         })
       )
       .catch((err) => {
@@ -130,10 +136,16 @@ class Feed extends Component<Props, State> {
   };
 
   render() {
+    if (this.state.isLoading) {
+      return <Spinner />;
+    }
     const filtered = this.getFilteredResults();
     return (
-      <div>
-        <h1>News Me</h1>
+      <div className="feed">
+        <h1 className="feed-title">{this.state.title || "News Me"}</h1>
+        {this.state.description && (
+          <p className="feed-description">{this.state.description}</p>
+        )}
         <div className="filters">
           <SearchBox
             placeholder="Search news.."
@@ -153,9 +165,9 @@ class Feed extends Component<Props, State> {
           />
         </div>
         <CustomButton onClick={() => this.loadData()}>
-          <div className="icon-reload"></div>
+          <div className="icon-reload cursor"></div>
         </CustomButton>
-        {this.state.isLoading ? <Spinner /> : <CardList news={filtered} />}
+        <CardList news={filtered} />
       </div>
     );
   }

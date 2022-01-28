@@ -244,7 +244,9 @@ def get_user_feeds(feed_id):
         return {
             'count': len(all_entries),
             'entries': all_entries,
-            'sources': list(set([entry['feed_name'] for entry in all_entries]))
+            'sources': list(set([entry['feed_name'] for entry in all_entries])),
+            'description': mongo_document['description'],
+            'title': mongo_document['title']
         }
     except Exception as error:
         print("Could not read all user feeds: ", error)

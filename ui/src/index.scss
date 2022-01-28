@@ -1,28 +1,26 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: #c04848; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to right,
-    #c04848,
-    #480048
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to right, #c04848, #480048);
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #c04848; /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #c04848, #480048); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #c04848, #480048);
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 .icon-reload {
-  height: 30px;
-  width: 100%;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-image: url("./assets/img/neu-laden.svg");
+    height: 30px;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: white;
+    background-image: url("./assets/img/neu-laden.svg");
+}
+
+.cursor {
+    cursor: pointer;
 }

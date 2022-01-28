@@ -5,7 +5,13 @@
     flex-direction: column;
     justify-content: center;
 
-    textarea {
+    label, p {
+        align-self: flex-start;
+        margin: 0 16px;
+        text-align: left;
+    }
+
+    textarea, input {
         margin: 16px;
         padding: 8px;
     }

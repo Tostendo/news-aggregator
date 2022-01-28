@@ -1,43 +1,58 @@
 @import "../../vars.scss";
 
-.filters {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    line-height: 30px;
-
-    > * {
-        padding: 0 5px;
-        line-height: 30px;
-        width: 150px;
-        border-radius: 0;
+.feed {
+    &-title {
+        font-size: 48px;
+        margin-top: 40px;
+        margin-bottom: 16px;
     }
 
-    .multi-select {
-        -webkit-appearance: none;
-        text-align: left;
-        font-size: $fs-normal;
+    p.feed-description {
+        color: white;
+        font-size: 16px;
+        margin: 10px 10px 32px 10px;
+    }
 
-        .dropdown-content {
-            font-size: 10px;
+    .filters {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        line-height: 30px;
 
-            .select-item {
-                padding: 10px;
-                line-height: 1.1;
-                overflow: hidden;
+        > * {
+            padding: 0 5px;
+            line-height: 30px;
+            width: 250px;
+            border-radius: 0;
+        }
+
+        .multi-select {
+            -webkit-appearance: none;
+            text-align: left;
+            font-size: $fs-normal;
+
+            .dropdown-content {
+                font-size: 10px;
+
+                .select-item {
+                    padding: 10px;
+                    line-height: 1.1;
+                    overflow: hidden;
+                }
             }
         }
     }
-}
 
-@media screen and (max-width: 576px) {
-    .filters {
-        flex-direction: column;
+    @media screen and (max-width: 576px) {
+        .filters {
+            flex-direction: column;
+            margin: 0 10px;
 
-        > * {
-            padding: 5px;
-            width: 200px;
+            > * {
+                padding: 5px;
+                width: 100%;
+            }
         }
     }
 }
