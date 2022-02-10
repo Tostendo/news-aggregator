@@ -12,7 +12,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.3.1",
-    "node-sass": "^6.0.1",
+    "node-sass": "^7.0.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-multi-select-component": "^4.1.0",
