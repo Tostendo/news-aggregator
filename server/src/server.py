@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 
-from bottle import hook, run, get, post, request, response,  abort, delete
+from bottle import hook, run, get, post, request, response,  abort
 
 import os
 from dotenv import load_dotenv
 import json
 import dateparser
 from datetime import datetime
-import random
 import uuid
 import time
 import sys
 import argparse
-from newsapi import NewsApiClient
 import feedparser
-import multiprocessing as mp
 import requests
+import multiprocessing as mp
 from html.parser import HTMLParser
 
 import pymongo
@@ -32,7 +30,7 @@ def init_db():
     global db_client
     load_dotenv()
     connect_string = os.environ.get(
-        'MONGO_DB_CONNECT_URL', os.getenv('MONGO_DB_CONNECT_URL'))
+        'MONGO_DB_CONNECT_URL', 'mongodb+srv://news-admin:F9ZoFvo1wDfmCk6D@news-aggregator.st2wy.mongodb.net/news-aggregator?retryWrites=true&w=majority')
     db_client = pymongo.MongoClient(connect_string)
     for i in range(0, MAX_NUMBER_TRIES):
         try:
@@ -68,7 +66,6 @@ class FeedHTMLParser(HTMLParser):
         self.data = data
 
 
-news_client = None
 my_parser = FeedHTMLParser()
 
 
@@ -134,32 +131,6 @@ def _transform_feed(feed_url):
     except Exception as error:
         print("Could not transform feed: ", error, feed_url)
         return []
-
-
-@get('/api/headlines')
-def get_headlines():
-    global news_client
-    query_params = request.query
-    query = query_params.get('q')
-    country = query_params.get('country', 'de')
-    language = query_params.get('language', 'de')
-    try:
-        headlines = news_client.get_top_headlines(
-            q=query, country=country, language=language)
-        return headlines
-    except Exception as error:
-        print("Error while fetching headlines: ", error)
-        abort(500, "Could not fetch headlines")
-
-
-@get('/api/sources')
-def get_sources():
-    global news_client
-    try:
-        return news_client.get_sources(country='de')
-    except Exception as error:
-        print("Could not fetch sources: ", error)
-        abort(500, "Could not fetch sources")
 
 
 @post('/api/feeds/sources')
@@ -320,14 +291,6 @@ def get_events():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--host", default="0.0.0.0")
-    parser.add_argument("--port", default=5000)
-    args = parser.parse_args()
-    try:
-        news_client = NewsApiClient(api_key=os.environ.get(
-            'NEWS_API_KEY', '3e8fa870c789473db6f68b03586d1f9d'))
-    except:
-        print("Error while initializing news client. Fix this!!!")
     init_db()
-    run(port=int(os.environ.get('PORT', args.port)), host=args.host)
+    run(host='localhost', port=5000)
+

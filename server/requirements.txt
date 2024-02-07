@@ -1,6 +1,5 @@
-newsapi-python==0.2.3
-feedparser==6.0.8
-bottle-cors==0.1.5
-dateparser==0.7.6
+feedparser
+dateparser
+bottle-cors
 pymongo[tls,srv]==3.12.1
-python-dotenv==0.19.1
+python-dotenv
