@@ -30,7 +30,7 @@ def init_db():
     global db_client
     load_dotenv()
     connect_string = os.environ.get(
-        'MONGO_DB_CONNECT_URL', 'mongodb+srv://news-admin:F9ZoFvo1wDfmCk6D@news-aggregator.st2wy.mongodb.net/news-aggregator?retryWrites=true&w=majority')
+        'MONGO_DB_CONNECT_URL', 'mongodb+srv://news-admin:Kw2KrooAFS8um2AM@news-aggregator.st2wy.mongodb.net/news-aggregator?retryWrites=true&w=majority')
     db_client = pymongo.MongoClient(connect_string)
     for i in range(0, MAX_NUMBER_TRIES):
         try:

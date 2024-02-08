@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useEffect, useState } from "react";
 import { MultiSelect } from "react-multi-select-component";
 import Spinner from "../with-spinner/spinner.component";
 import { CardList } from "../card-list/card-list.component";
@@ -10,167 +10,134 @@ import { getServerUrl } from "../../utils/server.utils";
 import { FeedMessage } from "../../types/message";
 
 import "./feed.style.scss";
+import { useParams } from "react-router-dom";
 
-type Props = {
-  match?: any;
-};
+const Feed = () => {
+  const { feedId } = useParams();
+  const [isLoading, setisLoading] = useState(true);
+  const [news, setNews] = useState([]);
+  const [filteredNews, setFilteredNews] = useState([]);
+  const [searchField, setSearchField] = useState("");
+  const [allSources, setAllSources] = useState([]);
+  const [selectedSources, setSelectedSources] = useState([]);
+  const [title, setTitle] = useState(null);
+  const [description, setDescription] = useState(null);
 
-type State = {
-  news: FeedMessage[];
-  filtered: FeedMessage[];
-  searchField: string;
-  isLoading: boolean;
-  allSources: { label: string; value: string }[];
-  selectedSources: { label: string; value: string }[];
-  title: string | null;
-  description: string | null;
-};
-
-class Feed extends Component<Props, State> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      isLoading: true,
-      news: [],
-      filtered: [],
-      searchField: "",
-      allSources: [],
-      selectedSources: [],
-      title: null,
-      description: null,
-    };
-  }
-
-  loadData = () => {
-    this.setState({
-      isLoading: true,
-    });
+  const loadData = () => {
+    setisLoading(true);
     let fetchUrl = null;
-    if (
-      !this.props.match ||
-      !this.props.match.params ||
-      !this.props.match.params.feedId ||
-      this.props.match.params.feedId === "" ||
-      this.props.match.params.feedId === "example"
-    ) {
+    if (!feedId || feedId === "" || feedId === "example") {
       fetchUrl = `${getServerUrl()}/api/feeds`;
       console.error("No feedId, use default");
     } else {
-      fetchUrl = `${getServerUrl()}/api/feeds/${
-        this.props.match.params.feedId
-      }`;
+      fetchUrl = `${getServerUrl()}/api/feeds/${feedId}`;
     }
     fetch(fetchUrl)
       .then((response) => response.json())
-      .then((news) =>
-        this.setState({
-          isLoading: false,
-          news: news["entries"],
-          allSources: news["sources"].map((source: string) => {
+      .then((loadedNews) => {
+        setisLoading(false);
+        setNews(loadedNews["entries"]);
+        setFilteredNews(loadedNews["entries"]);
+        setAllSources(
+          loadedNews["sources"].map((source: string) => {
             return {
               label: source,
               value: source.toLowerCase(),
             };
-          }),
-          description: news["description"],
-          title: news["title"],
-        })
-      )
+          })
+        );
+        setTitle(loadedNews["title"]);
+        setDescription(loadedNews["description"]);
+      })
       .catch((err) => {
-        this.setState({
-          isLoading: false,
-        });
+        setisLoading(false);
         console.error(err);
       });
   };
 
-  componentDidMount() {
-    this.loadData();
-  }
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  handleSearch = (e: any) => {
-    this.setState({
-      searchField: e.target.value,
-    });
+  const handleSearch = (e: any) => {
+    setSearchField(e.target.value);
+    setFilteredNews(getFilteredResults(e.target.value, selectedSources));
   };
 
-  handleSelect = (selected: any[]) => {
-    this.setState({
-      selectedSources: selected,
-    });
+  const handleSelect = (selected: any) => {
+    setSelectedSources(selected ?? []);
+    setFilteredNews(getFilteredResults(searchField, selected));
   };
 
-  // FIXME(TO): This should be refactored soon.
-  getFilteredResults = () => {
-    const { news, searchField, selectedSources } = this.state;
-    if (!searchField && selectedSources.length === 0) {
+  const getFilteredResults = (
+    searchInput: string,
+    userSelectedSources: any
+  ) => {
+    if (
+      (!searchInput || searchInput == "") &&
+      userSelectedSources.length === 0
+    ) {
       return news;
     }
 
-    const selectedFeeds = selectedSources.map((source) => source.value);
+    const selectedFeeds = userSelectedSources.map(
+      (source: any) => source.value
+    );
 
-    if (!searchField) {
+    if (!searchInput) {
       return news.filter((message: FeedMessage) =>
         selectedFeeds.includes(message.feed_name.toLowerCase())
       );
     }
 
-    if (selectedSources.length === 0) {
+    if (userSelectedSources.length === 0) {
       return news.filter((message: FeedMessage) => {
         return (
-          message.title.toLowerCase().includes(searchField.toLowerCase()) ||
-          message.feed_name.toLowerCase().includes(searchField.toLowerCase())
+          message.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+          message.feed_name.toLowerCase().includes(searchInput.toLowerCase())
         );
       });
     }
 
     return news.filter((message: FeedMessage) => {
       return (
-        (message.title.toLowerCase().includes(searchField.toLowerCase()) ||
+        (message.title.toLowerCase().includes(searchInput.toLowerCase()) ||
           message.feed_name
             .toLowerCase()
-            .includes(searchField.toLowerCase())) &&
+            .includes(searchInput.toLowerCase())) &&
         selectedFeeds.includes(message.feed_name.toLowerCase())
       );
     });
   };
 
-  render() {
-    if (this.state.isLoading) {
-      return <Spinner />;
-    }
-    const filtered = this.getFilteredResults();
-    return (
-      <div className="feed">
-        <h1 className="feed-title">{this.state.title || "News Me"}</h1>
-        {this.state.description && (
-          <p className="feed-description">{this.state.description}</p>
-        )}
-        <div className="filters">
-          <SearchBox
-            placeholder="Search news.."
-            handleSearch={this.handleSearch}
-          />
-          <MultiSelect
-            options={this.state.allSources}
-            value={this.state.selectedSources}
-            onChange={this.handleSelect}
-            labelledBy={"Select"}
-            overrideStrings={{
-              selectSomeItems: "Select feeds ...",
-              allItemsAreSelected: "All feeds are selected.",
-              selectAll: "Select All",
-              search: "Search",
-            }}
-          />
-        </div>
-        <CustomButton onClick={() => this.loadData()}>
-          <div className="icon-reload cursor"></div>
-        </CustomButton>
-        <CardList news={filtered} />
-      </div>
-    );
+  if (isLoading) {
+    return <Spinner />;
   }
-}
+  return (
+    <div className="feed">
+      <h1 className="feed-title">{title || "News Me"}</h1>
+      {description && <p className="feed-description">{description}</p>}
+      <div className="filters">
+        <SearchBox placeholder="Search news.." handleSearch={handleSearch} />
+        <MultiSelect
+          options={allSources}
+          value={selectedSources}
+          onChange={handleSelect}
+          labelledBy={"Select"}
+          overrideStrings={{
+            selectSomeItems: "Select feeds ...",
+            allItemsAreSelected: "All feeds are selected.",
+            selectAll: "Select All",
+            search: "Search",
+          }}
+        />
+      </div>
+      <CustomButton onClick={() => loadData()}>
+        <div className="icon-reload cursor"></div>
+      </CustomButton>
+      <CardList news={filteredNews} />
+    </div>
+  );
+};
 
 export default Feed;

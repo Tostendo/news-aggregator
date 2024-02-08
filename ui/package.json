@@ -4,21 +4,18 @@
   "private": true,
   "homepage": "https://tostendo.github.io/news-aggregator",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.14.1",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.0.0",
-    "@types/node": "^16.11.2",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.16",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "@types/react-router-dom": "^5.3.1",
-    "node-sass": "^6.0.1",
-    "react": "^17.0.0",
-    "react-dom": "^17.0.0",
-    "react-multi-select-component": "^4.1.0",
-    "react-router-dom": "^5.3.0",
-    "react-scripts": "4.0.3",
-    "typescript": "~4.4.4"
+    "node-sass": "^9.0.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-multi-select-component": "^4.3.4",
+    "react-router-dom": "^6.22.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^5.3.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -42,6 +39,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-async-generator-functions": "^7.20.7",
     "gh-pages": "^3.1.0"
   }
 }
