@@ -201,9 +201,17 @@ def get_user_feeds(feed_id):
     all_entries = []
     pool = mp.Pool(mp.cpu_count())
     try:
-        feeds_collection = db_client["news-aggregator"].feeds
-        mongo_document = feeds_collection.find_one({"_id": feed_id})
-        user_feeds = mongo_document["feeds"]
+        user_feeds = None
+        description = 'Example description'
+        title = 'Example title'
+        if feed_id == 'example':
+            user_feeds = all_feeds
+        else:
+            feeds_collection = db_client["news-aggregator"].feeds
+            mongo_document = feeds_collection.find_one({"_id": feed_id})
+            user_feeds = mongo_document["feeds"]
+            description = mongo_document['description']
+            title = mongo_document['title']
         if user_feeds is None or user_feeds == '':
             abort(404, "Could not find feeds for user.")
         results = pool.map(
@@ -215,12 +223,12 @@ def get_user_feeds(feed_id):
             'count': len(all_entries),
             'entries': all_entries,
             'sources': list(set([entry['feed_name'] for entry in all_entries])),
-            'description': mongo_document['description'],
-            'title': mongo_document['title']
+            'description': description,
+            'title': title
         }
     except Exception as error:
-        print("Could not read all user feeds: ", error)
-        abort(500, "Could not fetch all feeds")
+        print(f"Could not read user feed {feed_id}: ", error)
+        abort(500, "Could not fetch feed")
     finally:
         pool.close()
 
@@ -228,18 +236,20 @@ def get_user_feeds(feed_id):
 @get('/api/feeds')
 @timeit
 def get_feeds():
-    all_entries = []
     pool = mp.Pool(mp.cpu_count())
     try:
-        results = pool.map(
-            _transform_feed, [row for row in all_feeds])
-        [all_entries.extend(one_result) for one_result in results]
-        all_entries.sort(key=lambda entry:
-                         _parse_date(entry['published']), reverse=True)
+        feeds_collection = db_client["news-aggregator"].feeds
+        mongo_documents = list(feeds_collection.find({}))
+        print(mongo_documents)
+        all_feeds = [
+            {
+                'title': doc['title'] if 'title' in doc.keys() else 'Dummy',
+                'description': doc['description'] if 'description' in doc.keys() else 'Dummy',
+                'id': doc['_id']
+            } for doc in mongo_documents if len(doc['feeds']) > 0
+        ]
         return {
-            'count': len(all_entries),
-            'entries': all_entries,
-            'sources': list(set([entry['feed_name'] for entry in all_entries]))
+            'feeds': all_feeds
         }
     except Exception as error:
         print("Could not read all feeds: ", error)

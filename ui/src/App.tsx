@@ -6,6 +6,7 @@ import "./App.scss";
 import { Navbar } from "./components/navbar/navbar.component";
 import Feed from "./components/feed/feed.component";
 import UpsertFeed from "./components/upsert-feed/upsert-feed.component";
+import FeedList from "./components/feed-list/feed-list.component";
 
 class App extends Component<{}, {}> {
   render() {
@@ -16,6 +17,7 @@ class App extends Component<{}, {}> {
           <Route path="/create" element={<UpsertFeed />}></Route>
           <Route path="/feed/:feedId/edit" element={<UpsertFeed />}></Route>
           <Route path="/feed/:feedId" element={<Feed />} />
+          <Route path="/feeds" element={<FeedList />} />
           <Route path="/" element={<Feed />} />
         </Routes>
         <Footer />

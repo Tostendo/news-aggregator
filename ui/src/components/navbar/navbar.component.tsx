@@ -27,6 +27,9 @@ export const Navbar = () => {
         <li>
           <Link to="/create">Create Feed</Link>
         </li>
+        <li>
+          <Link to="/feeds">All Feeds</Link>
+        </li>
       </ul>
     </nav>
   );

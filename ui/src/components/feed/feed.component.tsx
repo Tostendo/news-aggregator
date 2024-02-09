@@ -31,7 +31,7 @@ const Feed = () => {
       curerentFeedId === "" ||
       curerentFeedId === "example"
     ) {
-      fetchUrl = `${getServerUrl()}/api/feeds`;
+      fetchUrl = `${getServerUrl()}/api/feeds/example`;
       console.error("No feedId, use default");
     } else {
       fetchUrl = `${getServerUrl()}/api/feeds/${curerentFeedId}`;

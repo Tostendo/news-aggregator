@@ -1,0 +1,23 @@
+.feed-list {
+  max-width: 1200px;
+  display: flex;
+  margin: 0 auto;
+
+  ul {
+    list-style: none;
+  }
+
+  ul > li {
+    min-width: 300px;
+    background-color: white;
+    padding: 10px 5px;
+    margin: 10px 10px;
+    border-radius: 2px;
+    text-decoration: none;
+
+    a {
+      text-decoration: none;
+      color: black;
+    }
+  }
+}
