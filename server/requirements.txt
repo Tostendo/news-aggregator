@@ -1,4 +1,5 @@
 feedparser
+requests
 dateparser
 bottle-cors
 pymongo[tls,srv]==3.12.1

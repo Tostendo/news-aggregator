@@ -10,7 +10,6 @@ from datetime import datetime
 import uuid
 import time
 import sys
-import argparse
 import feedparser
 import requests
 import multiprocessing as mp
