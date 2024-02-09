@@ -1,11 +1,11 @@
 name: Build and Deploy
+defaults:
+  run:
+    working-directory: ui
 on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: "ui"
     concurrency:
       group: "pages"
       cancel-in-progress: false
