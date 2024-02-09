@@ -23,14 +23,18 @@ const Feed = () => {
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
 
-  const loadData = () => {
+  const loadData = (curerentFeedId: string | null | undefined) => {
     setisLoading(true);
     let fetchUrl = null;
-    if (!feedId || feedId === "" || feedId === "example") {
+    if (
+      !curerentFeedId ||
+      curerentFeedId === "" ||
+      curerentFeedId === "example"
+    ) {
       fetchUrl = `${getServerUrl()}/api/feeds`;
       console.error("No feedId, use default");
     } else {
-      fetchUrl = `${getServerUrl()}/api/feeds/${feedId}`;
+      fetchUrl = `${getServerUrl()}/api/feeds/${curerentFeedId}`;
     }
     fetch(fetchUrl)
       .then((response) => response.json())
@@ -56,8 +60,8 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData(feedId);
+  }, [feedId]);
 
   const handleSearch = (e: any) => {
     setSearchField(e.target.value);
@@ -74,7 +78,7 @@ const Feed = () => {
     userSelectedSources: any
   ) => {
     if (
-      (!searchInput || searchInput == "") &&
+      (!searchInput || searchInput === "") &&
       userSelectedSources.length === 0
     ) {
       return news;
@@ -132,7 +136,7 @@ const Feed = () => {
           }}
         />
       </div>
-      <CustomButton onClick={() => loadData()}>
+      <CustomButton onClick={() => loadData(feedId)}>
         <div className="icon-reload cursor"></div>
       </CustomButton>
       <CardList news={filteredNews} />
