@@ -26,10 +26,6 @@ jobs:
         run: yarn install
       - name: Build
         run: yarn build
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: ./build
 
   deploy:
     environment:
@@ -43,3 +39,4 @@ jobs:
         uses: actions/deploy-pages@v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FOLDER: ui/build
