@@ -28,7 +28,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./server
           push: true
           tags: ghcr.io/tostendo/news-me-backend:latest
           cache-from: type=gha
