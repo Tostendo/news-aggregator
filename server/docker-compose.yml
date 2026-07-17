@@ -1,0 +1,13 @@
+services:
+  news-me-backend:
+    image: ghcr.io/tostendo/news-me-backend:latest
+    container_name: news-me-backend
+    restart: always
+    environment:
+      MONGO_DB_CONNECT_URL: ${MONGO_DB_CONNECT_URL}
+    networks:
+      - proxy # Reachable by Caddy
+
+networks:
+  proxy:
+    external: true # Shared Caddy network

@@ -240,7 +240,6 @@ def get_feeds():
     try:
         feeds_collection = db_client["news-aggregator"].feeds
         mongo_documents = list(feeds_collection.find({}))
-        print(mongo_documents)
         all_feeds = [
             {
                 'title': doc['title'] if 'title' in doc.keys() else 'Dummy',
@@ -273,33 +272,7 @@ def get_feed():
         abort(500, "Could not fetch feed")
 
 
-@get('/api/entertainment')
-def get_entertainment():
-    try:
-        r = requests.get(
-            'https://hamburg.mitvergnuegen.com/api/v1/posts/page/1')
-        if r:
-            data = list(
-                map(lambda post: {'url': post['url'], 'title': post['title']}, r.json()['posts']))
-            print(data)
-            return {'data': data}
-    except Exception as error:
-        print("Could not read entertainment: ", error)
-        abort(500, "Could not fetch entertainment")
-
-
-@get('/api/events')
-def get_events():
-    try:
-        r = requests.get(
-            'https://ohschonhell.de/ajax/data_cache.php?load=initial&osh_page=hamburg')
-        return r.json()
-    except Exception as error:
-        print("Could not read events: ", error)
-        abort(500, "Could not fetch events")
-
-
 if __name__ == "__main__":
     init_db()
-    run(port=int(os.environ.get('PORT', 5000)), host=os.environ.get('HOST', '0.0.0.0'))
-
+    run(port=int(os.environ.get('PORT', 5555)),
+        host=os.environ.get('HOST', '0.0.0.0'))

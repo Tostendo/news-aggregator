@@ -1,7 +1,7 @@
 export const getServerUrl = () => {
   if (process.env.NODE_ENV === "production") {
-    return "https://news-me-backend.herokuapp.com";
+    return "https://news-me.tostendo.de";
   } else {
-    return "http://0.0.0.0:5000";
+    return "http://localhost:5555";
   }
 };
